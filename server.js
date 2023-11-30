@@ -56,9 +56,9 @@ app.use(
       autoRemove: 'interval',
       autoRemoveInterval: 10, // Interval in minutes to clear expired sessions
     }),
-    cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    },
+    // cookie: {
+    //   maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    // },
   })
 );
 
