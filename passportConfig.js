@@ -19,7 +19,6 @@ exports.initializingPassport = (passport) => {
         const passwordMatch = bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-          console.log('Strategy: Incorrect password');
           return done(null, false, { message: 'Incorrect password' });
         }
 
@@ -59,7 +58,8 @@ exports.isAuthenticated = (req, res, next) => {
 };
 
 exports.ensureAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) return next();
+  console.log(req.headers);
+  if (req.headers.cookie) return next();
 
   res.status(401).json({ message: 'Unauthorized' });
 };
