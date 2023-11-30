@@ -24,7 +24,7 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 const corsOptions = {
-  origin: 'http://localhost:5500', // Replace with the actual origin of your frontend
+  origin: 'https://vwf.vercel.app/', // Replace with the actual origin of your frontend
   credentials: true, // Enable credentials (cookies) in the CORS request
 };
 
@@ -42,7 +42,7 @@ app.use(
     saveUninitialized: false,
 
     store: new MongoStore({
-      mongoUrl: 'mongodb://127.0.0.1:27017/passport',
+      mongoUrl: 'mongodb+srv://admin:adminT00r@vwf.6uock3g.mongodb.net/vwf',
       mongooseConnection: mongoose.connection,
     }),
     cookie: {
