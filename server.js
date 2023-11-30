@@ -66,7 +66,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Use the middleware for the /check-auth route
-app.get('/check-auth', isAuthenticated, (req, res) => {
+app.get('/check-auth', ensureAuthenticated, (req, res) => {
   try {
     // User is authenticated, return status 200 and authenticated true
     return res.status(200).json({ authenticated: true });
