@@ -8,14 +8,21 @@ const {
   getUsers,
 } = require('../controllers/userController');
 
-const { ensureAuthenticated } = require('../passportConfig');
+const { ensureAuthenticated, isAuthenticated } = require('../passportConfig');
 
 const router = express.Router();
 
-router.route('/').post(createUser).get(getAllUsers);
+router
+  .route('/')
+  .post(isAuthenticated, createUser)
+  .get(isAuthenticated, getAllUsers);
 
-router.post('/all', getUsers);
+router.post('/all', isAuthenticated, getUsers);
 
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+router
+  .route('/:id')
+  .get(isAuthenticated, getUser)
+  .patch(isAuthenticated, updateUser)
+  .delete(isAuthenticated, deleteUser);
 
 module.exports = router;
