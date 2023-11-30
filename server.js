@@ -7,6 +7,7 @@ const expressSession = require('express-session');
 const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const { connectMongoose } = require('./db/conn');
 
@@ -61,6 +62,8 @@ app.use(
     },
   })
 );
+
+app.use(cookieParser());
 
 app.use(passport.initialize());
 app.use(passport.session());

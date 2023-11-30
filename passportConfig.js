@@ -58,6 +58,12 @@ exports.isAuthenticated = (req, res, next) => {
 };
 
 exports.ensureAuthenticated = (req, res, next) => {
+  // Access the connect.sid cookie from the request object
+  const connectSidCookie = req.cookies['connect.sid'];
+
+  // Log the cookie value
+  console.log('connect.sid cookie:', connectSidCookie);
+
   if (req.isAuthenticated()) return next();
 
   res.status(401).json({ message: 'Unauthorized' });
