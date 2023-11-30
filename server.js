@@ -38,14 +38,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   expressSession({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
 
     store: new MongoStore({
       mongoUrl: process.env.MONGO_URI,
       mongooseConnection: mongoose.connection,
+      collectionName: 'sessions', // Specify the name of the collection for storing sessions
+      autoRemove: 'interval',
+      autoRemoveInterval: 10, // Interval in minutes to clear expired sessions
     }),
+
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     },
