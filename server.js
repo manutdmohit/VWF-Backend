@@ -42,7 +42,7 @@ app.use(
     saveUninitialized: false,
 
     store: new MongoStore({
-      mongoUrl: 'mongodb+srv://admin:adminT00r@vwf.6uock3g.mongodb.net/vwf',
+      mongoUrl: process.env.MONGO_URI,
       mongooseConnection: mongoose.connection,
     }),
     cookie: {
@@ -108,8 +108,8 @@ app.post('/register', async (req, res) => {
 app.post(
   '/login',
   passport.authenticate('local', {
-    failureRedirect: 'http://localhost:5500/admin.html',
-    successRedirect: 'http://localhost:5500/dashboard.html',
+    failureRedirect: 'https://vwf.vercel.app/admin.html',
+    successRedirect: 'https://vwf.vercel.app/dashboard.html',
   }),
   async (req, res) => {}
 );
