@@ -56,9 +56,11 @@ app.use(
       autoRemove: 'interval',
       autoRemoveInterval: 10, // Interval in minutes to clear expired sessions
     }),
-    // cookie: {
-    //   maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    // },
+    cookie: {
+      path: '/',
+      domain: 'https://vwf.vercel.app',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    },
   })
 );
 
@@ -129,7 +131,7 @@ app.post(
 
 app.get('/profile', isAuthenticated, (req, res) => {
   const { name, username, id } = req.user;
-  res.send({ name, email: username, id });
+  res.json({ name, email: username, id });
 });
 
 app.get('/logout', function (req, res, next) {
