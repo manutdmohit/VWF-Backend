@@ -58,7 +58,7 @@ exports.isAuthenticated = (req, res, next) => {
 };
 
 exports.ensureAuthenticated = (req, res, next) => {
-  console.log({ req });
+  console.log({ req: req.session });
   if (req.headers.cookie) return next();
 
   res.status(401).json({ message: 'Unauthorized' });
