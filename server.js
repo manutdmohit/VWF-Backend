@@ -23,12 +23,7 @@ const app = express();
 
 const PORT = process.env.PORT || 8000;
 
-const corsOptions = {
-  origin: 'https://vwf.vercel.app/', // Replace with the actual origin of your frontend
-  credentials: true, // Enable credentials (cookies) in the CORS request
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 initializingPassport(passport);
 
