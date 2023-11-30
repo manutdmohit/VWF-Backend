@@ -12,10 +12,17 @@ const { ensureAuthenticated } = require('../passportConfig');
 
 const router = express.Router();
 
-router.route('/').post(createUser).get(getAllUsers);
+router
+  .route('/')
+  .post(ensureAuthenticated, createUser)
+  .get(ensureAuthenticated, getAllUsers);
 
-router.post('/all', getUsers);
+router.post('/all', ensureAuthenticated, getUsers);
 
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+router
+  .route('/:id')
+  .get(ensureAuthenticated, getUser)
+  .patch(ensureAuthenticated, updateUser)
+  .delete(ensureAuthenticated, deleteUser);
 
 module.exports = router;
