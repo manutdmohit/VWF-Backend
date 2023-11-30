@@ -31,6 +31,13 @@ app.use(
   })
 );
 
+// Add the headers before your route or routes
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://vwf.vercel.app');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 initializingPassport(passport);
 
 app.use(express.json());
