@@ -25,19 +25,19 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Enable CORS for all routes
-// app.use(
-//   cors({
-//     origin: 'https://vwf.vercel.app', // Replace with your frontend URL
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: 'https://vwf.vercel.app', // Replace with your frontend URL
+    credentials: true,
+  })
+);
 
 // Add the headers before your route or routes
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://vwf.vercel.app');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', 'https://vwf.vercel.app');
+//   res.setHeader('Access-Control-Allow-Credentials', 'true');
+//   next();
+// });
 
 initializingPassport(passport);
 
