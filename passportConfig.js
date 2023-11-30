@@ -55,7 +55,7 @@ passport.deserializeUser(async (id, done) => {
 exports.isAuthenticated = (req, res, next) => {
   if (req.user) return next();
 
-  res.redirect('/login');
+  res.status(401).json({ message: 'Unauthorized' });
 };
 
 exports.ensureAuthenticated = (req, res, next) => {
