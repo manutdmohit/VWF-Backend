@@ -59,6 +59,7 @@ app.use(
     cookie: {
       path: '/',
       domain: 'https://vwf.vercel.app',
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     },
   })
