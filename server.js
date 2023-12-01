@@ -7,70 +7,57 @@ const expressSession = require('express-session');
 const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 const { connectMongoose } = require('./db/conn');
+
+const {
+  jwtSecret,
+  jwtOptions,
+  ensureAuthenticated,
+} = require('./passportConfig');
 
 const userRouter = require('./routes/userRoutes');
 
 const User = require('./models/User');
-const {
-  initializingPassport,
-  isAuthenticated,
-  ensureAuthenticated,
-} = require('./passportConfig');
 
 const app = express();
 
-const PORT = process.env.PORT || 8000;
+const PORT = 8000;
 
-// Enable CORS for all routes
-app.use(
-  cors({
-    origin: 'https://vwf.vercel.app', // Replace with your frontend URL
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: 'http://localhost:5500', // Replace with the actual origin of your frontend
+  credentials: true, // Enable credentials (cookies) in the CORS request
+};
 
-// Add the headers before your route or routes
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://vwf.vercel.app');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
-
-initializingPassport(passport);
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
   expressSession({
-    secret: process.env.SESSION_SECRET,
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
+
     store: new MongoStore({
       mongoUrl: process.env.MONGO_URI,
       mongooseConnection: mongoose.connection,
-      collectionName: 'sessions', // Specify the name of the collection for storing sessions
-      autoRemove: 'interval',
-      autoRemoveInterval: 10, // Interval in minutes to clear expired sessions
     }),
     cookie: {
-      path: '/',
-      domain: 'https://vwf.vercel.app',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     },
   })
 );
-
-app.use(cookieParser());
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Use the middleware for the /check-auth route
 app.get('/check-auth', ensureAuthenticated, (req, res) => {
+  console.log(req.isAuthenticated());
+
   try {
     // User is authenticated, return status 200 and authenticated true
     return res.status(200).json({ authenticated: true });
@@ -104,8 +91,6 @@ app.use('/api/v1/users', userRouter);
 
 app.get('/register', (req, res) => res.render('register'));
 
-// Use the middleware for the /check-auth route
-
 app.get('/login', (req, res) => res.render('login'));
 
 app.post('/register', async (req, res) => {
@@ -122,20 +107,29 @@ app.post('/register', async (req, res) => {
 
 app.post(
   '/login',
-  passport.authenticate('local', {
-    failureRedirect: 'https://vwf.vercel.app/admin.html',
-    successRedirect: 'https://vwf.vercel.app/dashboard.html',
-  }),
-  async (req, res) => {}
+  passport.authenticate('local', { session: false }),
+  (req, res) => {
+    // If this function is called, authentication was successful.
+    // `req.user` contains the authenticated user.
+    const token = jwt.sign({ sub: req.user._id }, jwtSecret, {
+      expiresIn: '1h',
+    });
+    res.send({ token });
+  },
+  (err, req, res, next) => {
+    // This function will be called on authentication failure
+    // Handle the failure and send a JSON response
+    res.status(401).json({ message: 'Authentication failed' });
+  }
 );
 
-app.get('/profile', isAuthenticated, (req, res) => {
+app.get('/profile', ensureAuthenticated, (req, res) => {
   const { name, username, id } = req.user;
-  res.json({ name, email: username, id });
+  res.send({ name, email: username, id });
 });
 
-app.get('/logout', function (req, res, next) {
-  req.logout(function (err) {
+app.get('/logout', (req, res, next) => {
+  req.logout((err) => {
     if (err) {
       return next(err);
     }

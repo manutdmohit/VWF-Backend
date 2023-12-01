@@ -1,35 +1,55 @@
 const passport = require('passport');
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+const LocalStrategy = require('passport-local').Strategy; // Add this line
 const bcrypt = require('bcrypt');
 
 const User = require('./models/User');
 
-const LocalStrategy = require('passport-local').Strategy;
+const jwtSecret = 'your-jwt-secret'; // Replace with your own secret
 
-exports.initializingPassport = (passport) => {
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await User.findOne({ username });
-
-        if (!user) {
-          console.log('Strategy: User not found');
-          return done(null, false, { message: 'Incorrect username' });
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatch) {
-          return done(null, false, { message: 'Incorrect password' });
-        }
-
-        return done(null, user);
-      } catch (error) {
-        console.error('Strategy: Error during authentication', error);
-        return done(error);
-      }
-    })
-  );
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret,
 };
+
+passport.use(
+  new JwtStrategy(jwtOptions, async (payload, done) => {
+    try {
+      const user = await User.findById(payload.sub);
+
+      if (!user) {
+        return done(null, false, { message: 'User not found' });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error, false);
+    }
+  })
+);
+
+// Add LocalStrategy for username/password authentication
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({ username });
+
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username' });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+        return done(null, false, { message: 'Incorrect password' });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  })
+);
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -40,32 +60,24 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findById(id);
 
     if (!user) {
-      // User not found
       return done(null, false);
     }
 
-    // Deserialization successful
     done(null, user);
   } catch (error) {
-    console.error('Error during deserialization', error);
     done(error);
   }
 });
 
-exports.isAuthenticated = (req, res, next) => {
-  if (req.user) return next();
-
-  res.redirect('/login');
-};
+exports.jwtSecret = jwtSecret;
+exports.jwtOptions = jwtOptions;
 
 exports.ensureAuthenticated = (req, res, next) => {
-  // Access the connect.sid cookie from the request object
-  const connectSidCookie = req.cookies['connect.sid'];
-
-  // Log the cookie value
-  console.log('connect.sid cookie:', connectSidCookie);
-
-  if (req.isAuthenticated()) return next();
-
-  res.status(401).json({ message: 'Unauthorized' });
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    req.user = user;
+    return next();
+  })(req, res, next);
 };
