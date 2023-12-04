@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   expressSession({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
 
