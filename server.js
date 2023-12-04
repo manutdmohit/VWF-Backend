@@ -26,7 +26,7 @@ const app = express();
 const PORT = 8000;
 
 const corsOptions = {
-  origin: 'https://vwf.vercel.app', // Replace with the actual origin of your frontend
+  origin: process.env.FRONTEND_URL, // Replace with the actual origin of your frontend
   credentials: true, // Enable credentials (cookies) in the CORS request
 };
 
