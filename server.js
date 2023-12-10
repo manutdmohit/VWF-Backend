@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary').v2;
 
 const { connectMongoose } = require('./db/conn');
 
@@ -18,6 +19,7 @@ const {
 } = require('./passportConfig');
 
 const userRouter = require('./routes/userRoutes');
+const galleryRouter = require('./routes/galleryRoutes');
 
 const User = require('./models/User');
 
@@ -25,15 +27,21 @@ const app = express();
 
 const PORT = 8000;
 
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
 const corsOptions = {
   origin: process.env.FRONTEND_URL, // Replace with the actual origin of your frontend
   credentials: true, // Enable credentials (cookies) in the CORS request
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 app.use(
   expressSession({
@@ -56,8 +64,6 @@ app.use(passport.session());
 
 // Use the middleware for the /check-auth route
 app.get('/check-auth', ensureAuthenticated, (req, res) => {
-  console.log(req.isAuthenticated());
-
   try {
     // User is authenticated, return status 200 and authenticated true
     return res.status(200).json({ authenticated: true });
@@ -88,6 +94,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/gallery', galleryRouter);
 
 app.get('/register', (req, res) => res.render('register'));
 
