@@ -65,3 +65,28 @@ exports.getAllImages = async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({ gallery });
 };
+
+exports.deleteImage = async (req, res) => {
+  try {
+    const { asset_id } = req.params;
+
+    const gallery = await Gallery.findOne({
+      'images.asset_id': asset_id,
+    });
+
+    if (!gallery) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Image not found in the gallery' });
+    }
+
+    const result = await gallery.deleteImage(asset_id);
+
+    return res.status(result.success ? 200 : 500).json(result);
+  } catch (error) {
+    console.error('Error:', error);
+    return res
+      .status(500)
+      .json({ success: false, message: 'Internal server error' });
+  }
+};

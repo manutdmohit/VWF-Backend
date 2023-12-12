@@ -8,10 +8,13 @@ const upload = multer({ storage }).array('images', 10); // 'images' is the field
 const {
   uploadImages,
   getAllImages,
+  deleteImage,
 } = require('../controllers/galleryController');
 
 const router = express.Router();
 
 router.route('/').post(upload, uploadImages).get(getAllImages);
+
+router.route('/:asset_id').delete(deleteImage);
 
 module.exports = router;
