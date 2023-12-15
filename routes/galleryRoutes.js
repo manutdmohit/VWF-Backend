@@ -10,11 +10,15 @@ const {
   getAllImages,
   deleteImage,
 } = require('../controllers/galleryController');
+const { ensureAuthenticated } = require('../passportConfig');
 
 const router = express.Router();
 
-router.route('/').post(upload, uploadImages).get(getAllImages);
+router
+  .route('/')
+  .post(ensureAuthenticated, upload, uploadImages)
+  .get(getAllImages);
 
-router.route('/:asset_id').delete(deleteImage);
+router.route('/:asset_id').delete(ensureAuthenticated, deleteImage);
 
 module.exports = router;

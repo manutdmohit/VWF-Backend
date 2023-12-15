@@ -14,11 +14,15 @@ exports.uploadImages = async (req, res) => {
   const uploadedImages = [];
   const limit = pLimit(2); // Adjust the concurrency limit as needed
 
+  if (req.files.length > 10) {
+    throw new Error('Max Upload limit is 10');
+  }
+
   // Define a function to upload a single image
   const uploadImage = (file) => {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto' },
+        { resource_type: 'image' },
         (error, result) => {
           if (error) {
             reject({ file, error });
@@ -41,6 +45,10 @@ exports.uploadImages = async (req, res) => {
 
   // Upload images concurrently using async/await and pLimit
   const uploadPromises = req.files.map((file) => {
+    if (!file.mimetype.startsWith('image')) {
+      throw new Error('Please upload image only');
+    }
+
     return limit(() => uploadImage(file));
   });
 

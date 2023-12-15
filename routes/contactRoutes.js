@@ -8,6 +8,6 @@ const { ensureAuthenticated } = require('../passportConfig');
 
 const router = express.Router();
 
-router.route('/').post(addContact).get(getAllContacts);
+router.route('/').post(addContact).get(ensureAuthenticated, getAllContacts);
 
 module.exports = router;
