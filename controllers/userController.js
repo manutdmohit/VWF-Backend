@@ -95,3 +95,27 @@ exports.deleteUser = async (req, res) => {
 
   res.status(200).json({ msg: 'User deleted successfully' });
 };
+
+exports.updateUserPassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    throw new Error(`No user found with id ${req.user.id}`);
+  }
+
+  const isPasswordValid = await user.comparePassword(currentPassword);
+
+  if (!isPasswordValid) {
+    return res.status(401).json({ message: 'Invalid current password' });
+  }
+
+  // Update the password
+  user.password = newPassword;
+
+  // Save the updated user object with the new password
+  await user.save();
+
+  return res.status(200).json({ message: 'Password updated successfully' });
+};

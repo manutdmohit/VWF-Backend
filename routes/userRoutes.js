@@ -6,6 +6,7 @@ const {
   updateUser,
   deleteUser,
   getUsers,
+  updateUserPassword,
 } = require('../controllers/userController');
 
 const { ensureAuthenticated } = require('../passportConfig');
@@ -18,6 +19,8 @@ router
   .get(ensureAuthenticated, getAllUsers);
 
 router.post('/all', ensureAuthenticated, getUsers);
+
+router.patch('/updatepassword', ensureAuthenticated, updateUserPassword);
 
 router
   .route('/:id')
