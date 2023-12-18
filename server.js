@@ -21,6 +21,7 @@ const {
 const userRouter = require('./routes/userRoutes');
 const galleryRouter = require('./routes/galleryRoutes');
 const contactRouter = require('./routes/contactRoutes');
+const postRouter = require('./routes/postRoutes');
 
 const User = require('./models/User');
 
@@ -98,6 +99,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/gallery', galleryRouter);
 app.use('/api/v1/contacts', contactRouter);
+app.use('/api/v1/posts', postRouter);
 
 app.get('/register', (req, res) => res.render('register'));
 
