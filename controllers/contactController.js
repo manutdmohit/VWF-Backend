@@ -15,3 +15,15 @@ exports.getAllContacts = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ contacts });
 };
+
+exports.deleteContact = async (req, res) => {
+  const { id } = req.params;
+
+  const contact = await Contact.findByIdAndDelete(id);
+
+  if (!contact) {
+    throw new Error(`No contact found with id ${id}`);
+  }
+
+  res.status(StatusCodes.OK).json({ msg: 'Contact deleted successfully' });
+};
